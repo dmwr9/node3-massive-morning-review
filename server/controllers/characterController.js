@@ -3,19 +3,29 @@ id = 0
 
 module.exports = {
     getAllCharacters: (req, res) => {
-        res.status(200).send(masterCharacterList)
+        const db = req.app.get('db');
+        db.get_all_characters()
+        .then( characters => res.status(200).send(characters))
+        .catch( err => res.status(500).send(err))
     },
     getCharacter: (req, res) => {
         const {id} = req.params
-        const character = masterCharacterList.find(character => character.id === +id)
-        res.status(200).send(character)
+        const db = req.app.get('db');
+        db.get_character(+id)
+        .then( character => res.status(200).send(character) )
+        .catch( err => res.status(500).send(err) )
     },
     addCharacter: (req, res) => {
-        const newCharacter = {...req.body}
-        newCharacter.id = id
-        id++
-        masterCharacterList.push(newCharacter)
-        res.status(200).send(masterCharacterList)
+        // const newCharacter = {...req.body}
+        // {
+        //     name: "Spongebob",
+        //     image: "image.url.png"
+        // }
+        const {name, image} = req.body
+        const db = req.app.get('db');
+        db.add_character([name, image])
+        .then(characters => res.status(200).send(characters))
+        .catch( err => res.status(500).send(err))
     },
     editCharacter: (req, res) => {
         const {id} = req.params
